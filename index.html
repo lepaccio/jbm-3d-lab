@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JBM 3D Lab — RE001 runtime material switcher (1 GLB)</title>
+  <script type="module"
+    src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <style>
+    :root { --bg:#f4f1ec; --ink:#1a1a1a; --muted:#6b6b6b; --line:#e3ddd2; }
+    * { box-sizing: border-box; }
+    body {
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--ink);
+      display:flex; min-height:100vh; align-items:center; justify-content:center; padding:24px;
+    }
+    .card {
+      width:100%; max-width:980px; background:#fff; border:1px solid var(--line);
+      border-radius:20px; overflow:hidden; display:grid; grid-template-columns: 1.3fr 1fr;
+    }
+    @media (max-width:760px){ .card{ grid-template-columns:1fr; } }
+    model-viewer {
+      width:100%; height:520px; background:
+        radial-gradient(120% 90% at 50% 10%, #fbf9f5 0%, #ece6da 100%);
+      --poster-color: transparent;
+    }
+    .panel { padding:28px 26px; display:flex; flex-direction:column; gap:22px; }
+    .lab { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#b08d57; }
+    h1 { font-size:18px; margin:4px 0 0; font-weight:650; letter-spacing:-.01em; }
+    .sub { font-size:12.5px; color:var(--muted); line-height:1.55; }
+    .group-label { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px; }
+    .swatches { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px; }
+    .sw {
+      width:46px; height:46px; border-radius:999px; cursor:pointer; border:2px solid transparent;
+      box-shadow: inset 0 0 0 2px #fff, 0 1px 3px rgba(0,0,0,.18); position:relative; padding:0;
+      transition: transform .12s ease;
+    }
+    .sw:hover { transform: translateY(-2px); }
+    .sw[aria-pressed="true"] { border-color: var(--ink); }
+    .sw .tag {
+      position:absolute; top:54px; left:50%; transform:translateX(-50%);
+      font-size:10.5px; color:var(--muted); white-space:nowrap;
+    }
+    .gemrow { display:flex; gap:8px; flex-wrap:wrap; }
+    .gem {
+      padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:#fff;
+      cursor:pointer; font-size:13px; display:flex; align-items:center; gap:8px;
+    }
+    .gem[aria-pressed="true"]{ border-color:var(--ink); background:#faf8f4; }
+    .dot{ width:12px; height:12px; border-radius:999px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); }
+    .note { font-size:11.5px; color:var(--muted); line-height:1.55; border-top:1px solid var(--line); padding-top:14px; }
+    code { background:#f1ede6; padding:1px 5px; border-radius:5px; font-size:11px; }
+    .status { font-size:11px; color:#9a8f7c; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <model-viewer
+      id="mv"
+      src="./models/RE001-web.glb"
+      environment-image="./models/studio.hdr"
+      camera-controls touch-action="pan-y"
+      shadow-intensity="0.6" shadow-softness="0.85"
+      exposure="1.0" tone-mapping="commerce"
+      field-of-view="30deg"
+      camera-orbit="0deg 75deg 160%"
+      min-camera-orbit="auto auto 130%" max-camera-orbit="auto auto 224%"
+      interaction-prompt="none">
+    </model-viewer>
+
+    <div class="panel">
+      <div>
+        <div class="lab">JBM 3D Lab · aislado</div>
+        <h1>RE001 — Engagement Ring</h1>
+        <p class="sub">Un solo <code>RE001-web.glb</code> local. Metal y piedra cambian en tiempo real
+        vía la scene-graph API de model-viewer. Cero recargas, cero GLBs extra.</p>
+      </div>
+
+      <div>
+        <div class="group-label">Metal</div>
+        <div class="swatches" id="metals"></div>
+
+        <div class="group-label">Stone</div>
+        <div class="gemrow" id="gems"></div>
+      </div>
+
+      <div class="status" id="status">cargando modelo…</div>
+
+      <div class="note">
+        <strong>2 materiales en el GLB:</strong> <code>WhiteMetal</code> (aro) y <code>Diamond</code>
+        (106 piedras). Cambiamos <code>baseColorFactor</code> / <code>metallic</code> / <code>roughness</code>
+        del slot correcto al vuelo. El metal se ve fiel; la piedra cambia de color pero el brillo real-time
+        es aproximado (no iguala los renders Cycles del gallery).
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const mv = document.getElementById('mv');
+    const statusEl = document.getElementById('status');
+
+    // valores EXACTOS de produccion (leidos de los glbs RE001/RE001W/RE001R + fix-glb-materials.py)
+    const METALS = [
+      { id:'yellow', label:'Yellow Gold', swatch:'linear-gradient(135deg,#f0d27a,#c79c2f)',
+        base:[1.00,0.82,0.43,1], metallic:1.0, rough:0.10 },
+      { id:'white',  label:'White Gold',  swatch:'linear-gradient(135deg,#ebeced,#b2b6bd)',
+        base:[0.97,0.97,0.98,1], metallic:1.0, rough:0.04 },
+      { id:'rose',   label:'Rose Gold',   swatch:'linear-gradient(135deg,#f0c6b4,#c08066)',
+        base:[0.95,0.65,0.56,1], metallic:1.0, rough:0.10 },
+    ];
+
+    // nota: runtime solo puede pintar baseColor — NO puede setear volume/ior/dispersion,
+    // por eso las gemas de color aqui se ven planas vs variants.html (horneado)
+    const GEMS = [
+      { id:'diamond',  label:'Diamond',  dot:'#dfe7ef', base:[1.00,1.00,1.00,1], rough:0.01 },
+      { id:'sapphire', label:'Sapphire', dot:'#1f4fbf', base:[0.16,0.31,0.70,1], rough:0.04 },
+      { id:'ruby',     label:'Ruby',     dot:'#b3122b', base:[0.88,0.10,0.35,1], rough:0.04 },
+      { id:'emerald',  label:'Emerald',  dot:'#0e8a4f', base:[0.18,0.80,0.48,1], rough:0.05 },
+    ];
+
+    const metalMat = () => mv.model.materials.find(x => /metal|gold/i.test(x.name)) || mv.model.materials[0];
+    const gemMat   = () => mv.model.materials.find(x => /diamond|gem|stone/i.test(x.name)) || mv.model.materials[1] || mv.model.materials[0];
+
+    function applyMetal(v){
+      const pbr = metalMat().pbrMetallicRoughness;
+      pbr.setBaseColorFactor(v.base);
+      pbr.setMetallicFactor(v.metallic);
+      pbr.setRoughnessFactor(v.rough);
+    }
+    function applyGem(v){
+      const pbr = gemMat().pbrMetallicRoughness;
+      pbr.setBaseColorFactor(v.base);
+      pbr.setRoughnessFactor(v.rough);
+    }
+
+    const metalsBox = document.getElementById('metals');
+    const gemsBox = document.getElementById('gems');
+
+    METALS.forEach((v,i)=>{
+      const el = document.createElement('button');
+      el.className='sw'; el.style.background=v.swatch; el.title=v.label;
+      el.setAttribute('aria-pressed', i===0 ? 'true':'false');
+      el.innerHTML=`<span class="tag">${v.label}</span>`;
+      el.onclick=()=>{ applyMetal(v); mark(metalsBox, el); };
+      metalsBox.appendChild(el);
+    });
+
+    GEMS.forEach((v,i)=>{
+      const el = document.createElement('button');
+      el.className='gem';
+      el.setAttribute('aria-pressed', i===0 ? 'true':'false');
+      el.innerHTML=`<span class="dot" style="background:${v.dot}"></span>${v.label}`;
+      el.onclick=()=>{ applyGem(v); mark(gemsBox, el); };
+      gemsBox.appendChild(el);
+    });
+
+    function mark(box, active){
+      [...box.children].forEach(c=>c.setAttribute('aria-pressed','false'));
+      active.setAttribute('aria-pressed','true');
+    }
+
+    mv.addEventListener('load', ()=>{
+      const names = mv.model.materials.map(m=>m.name).join(', ');
+      statusEl.textContent = `materiales: ${names} — listo. Arrastra para rotar.`;
+      applyMetal(METALS[0]);
+      applyGem(GEMS[0]);
+    });
+    mv.addEventListener('error', ()=>{ statusEl.textContent = 'error cargando GLB'; });
+  </script>
+</body>
+</html>

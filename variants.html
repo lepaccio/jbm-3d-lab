@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JBM 3D Lab — RE001 baked variants (KHR_materials_variants)</title>
+  <script type="module"
+    src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <style>
+    :root { --bg:#f4f1ec; --ink:#1a1a1a; --muted:#6b6b6b; --line:#e3ddd2; }
+    * { box-sizing: border-box; }
+    body {
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--ink);
+      display:flex; min-height:100vh; align-items:center; justify-content:center; padding:24px;
+    }
+    .card {
+      width:100%; max-width:980px; background:#fff; border:1px solid var(--line);
+      border-radius:20px; overflow:hidden; display:grid; grid-template-columns: 1.3fr 1fr;
+    }
+    @media (max-width:760px){ .card{ grid-template-columns:1fr; } }
+    model-viewer {
+      width:100%; height:520px; background:
+        radial-gradient(120% 90% at 50% 10%, #fbf9f5 0%, #ece6da 100%);
+      --poster-color: transparent;
+    }
+    .panel { padding:28px 26px; display:flex; flex-direction:column; gap:22px; }
+    .lab { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#b08d57; }
+    h1 { font-size:18px; margin:4px 0 0; font-weight:650; letter-spacing:-.01em; }
+    .sub { font-size:12.5px; color:var(--muted); line-height:1.55; }
+    .badge { display:inline-block; font-size:10.5px; background:#eef3ec; color:#3a6b3a;
+      border:1px solid #cfe0cb; padding:2px 8px; border-radius:999px; margin-top:6px; }
+    .group-label { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px; }
+    .swatches { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px; }
+    .sw {
+      width:46px; height:46px; border-radius:999px; cursor:pointer; border:2px solid transparent;
+      box-shadow: inset 0 0 0 2px #fff, 0 1px 3px rgba(0,0,0,.18); position:relative; padding:0;
+      transition: transform .12s ease;
+    }
+    .sw:hover { transform: translateY(-2px); }
+    .sw[aria-pressed="true"] { border-color: var(--ink); }
+    .sw .tag { position:absolute; top:54px; left:50%; transform:translateX(-50%);
+      font-size:10.5px; color:var(--muted); white-space:nowrap; }
+    .gemrow { display:flex; gap:8px; flex-wrap:wrap; }
+    .gem {
+      padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:#fff;
+      cursor:pointer; font-size:13px; display:flex; align-items:center; gap:8px;
+    }
+    .gem[aria-pressed="true"]{ border-color:var(--ink); background:#faf8f4; }
+    .dot{ width:12px; height:12px; border-radius:999px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); }
+    .note { font-size:11.5px; color:var(--muted); line-height:1.55; border-top:1px solid var(--line); padding-top:14px; }
+    code { background:#f1ede6; padding:1px 5px; border-radius:5px; font-size:11px; }
+    .status { font-size:11px; color:#9a8f7c; }
+    .compare { position:fixed; top:16px; right:16px; font-size:12px; background:#fff;
+      border:1px solid var(--line); border-radius:10px; padding:8px 12px; text-decoration:none; color:var(--ink); }
+  </style>
+</head>
+<body>
+  <a class="compare" href="./index.html">← ver método runtime (baseColor)</a>
+  <div class="card">
+    <model-viewer
+      id="mv"
+      src="./models/RE001-variants.glb"
+      environment-image="./models/studio.hdr"
+      camera-controls touch-action="pan-y"
+      shadow-intensity="0.6" shadow-softness="0.85"
+      exposure="1.0" tone-mapping="commerce"
+      field-of-view="30deg"
+      camera-orbit="0deg 75deg 160%"
+      min-camera-orbit="auto auto 130%" max-camera-orbit="auto auto 224%"
+      interaction-prompt="none">
+    </model-viewer>
+
+    <div class="panel">
+      <div>
+        <div class="lab">JBM 3D Lab · horneado</div>
+        <h1>RE001 — Engagement Ring</h1>
+        <p class="sub">Un solo <code>RE001-variants.glb</code> con <strong>12 variantes horneadas</strong>
+        (3 metales × 4 piedras). Cada una usa el material físico real — oro con especular teñido,
+        gema con absorción en volumen, IOR y dispersión — vía <code>KHR_materials_variants</code>.</p>
+        <span class="badge">mismos valores que fix-glb-materials.py · physicallybased.info</span>
+      </div>
+
+      <div>
+        <div class="group-label">Metal</div>
+        <div class="swatches" id="metals"></div>
+
+        <div class="group-label">Stone</div>
+        <div class="gemrow" id="gems"></div>
+      </div>
+
+      <div class="status" id="status">cargando modelo…</div>
+
+      <div class="note">
+        <strong>Diferencia vs el otro tab:</strong> aquí el color de la gema sale de
+        <code>attenuationColor</code> + <code>attenuationDistance</code> (luz absorbida al atravesar
+        el volumen) y cada piedra trae su <code>ior</code> propio (diamante 2.42, zafiro/rubí 1.77,
+        esmeralda 1.58). El metal trae especular real. Esto es lo que el runtime <em>no</em> puede tocar.
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const mv = document.getElementById('mv');
+    const statusEl = document.getElementById('status');
+
+    const METALS = [
+      { id:'yellow gold', label:'Yellow Gold', swatch:'linear-gradient(135deg,#f0d27a,#c79c2f)' },
+      { id:'white gold',  label:'White Gold',  swatch:'linear-gradient(135deg,#ebeced,#b2b6bd)' },
+      { id:'rose gold',   label:'Rose Gold',   swatch:'linear-gradient(135deg,#f0c6b4,#c08066)' },
+    ];
+    const GEMS = [
+      { id:'diamond',  label:'Diamond',  dot:'#dfe7ef' },
+      { id:'sapphire', label:'Sapphire', dot:'#1f4fbf' },
+      { id:'ruby',     label:'Ruby',     dot:'#b3122b' },
+      { id:'emerald',  label:'Emerald',  dot:'#0e8a4f' },
+    ];
+
+    let metal = METALS[0].id, gem = GEMS[0].id;
+    function apply(){
+      const name = `${metal}|${gem}`;
+      mv.variantName = name;
+      statusEl.textContent = `variante activa: ${name}`;
+    }
+
+    const metalsBox = document.getElementById('metals');
+    const gemsBox = document.getElementById('gems');
+
+    METALS.forEach((v,i)=>{
+      const el = document.createElement('button');
+      el.className='sw'; el.style.background=v.swatch; el.title=v.label;
+      el.setAttribute('aria-pressed', i===0 ? 'true':'false');
+      el.innerHTML=`<span class="tag">${v.label}</span>`;
+      el.onclick=()=>{ metal=v.id; mark(metalsBox, el); apply(); };
+      metalsBox.appendChild(el);
+    });
+    GEMS.forEach((v,i)=>{
+      const el = document.createElement('button');
+      el.className='gem';
+      el.setAttribute('aria-pressed', i===0 ? 'true':'false');
+      el.innerHTML=`<span class="dot" style="background:${v.dot}"></span>${v.label}`;
+      el.onclick=()=>{ gem=v.id; mark(gemsBox, el); apply(); };
+      gemsBox.appendChild(el);
+    });
+    function mark(box, active){
+      [...box.children].forEach(c=>c.setAttribute('aria-pressed','false'));
+      active.setAttribute('aria-pressed','true');
+    }
+
+    mv.addEventListener('load', ()=>{
+      const avail = (mv.availableVariants || []).length;
+      statusEl.textContent = `${avail} variantes disponibles — listo. Arrastra para rotar.`;
+      apply();
+    });
+    mv.addEventListener('error', ()=>{ statusEl.textContent='error cargando GLB'; });
+  </script>
+</body>
+</html>
