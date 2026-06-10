@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JBM 3D Lab — RE001 combinación central + pavé</title>
+  <script type="module"
+    src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <style>
+    :root { --bg:#f4f1ec; --ink:#1a1a1a; --muted:#6b6b6b; --line:#e3ddd2; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--ink);
+      display:flex; min-height:100vh; align-items:center; justify-content:center; padding:24px; }
+    .card { width:100%; max-width:1000px; background:#fff; border:1px solid var(--line);
+      border-radius:20px; overflow:hidden; display:grid; grid-template-columns: 1.25fr 1fr; }
+    @media (max-width:780px){ .card{ grid-template-columns:1fr; } }
+    model-viewer { width:100%; height:540px;
+      background: radial-gradient(120% 90% at 50% 10%, #fbf9f5 0%, #ece6da 100%); --poster-color: transparent; }
+    .panel { padding:26px 24px; display:flex; flex-direction:column; gap:18px; }
+    .lab { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#b08d57; }
+    h1 { font-size:18px; margin:4px 0 0; font-weight:650; letter-spacing:-.01em; }
+    .sub { font-size:12.5px; color:var(--muted); line-height:1.5; }
+    .group-label { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:10px; }
+    .block { display:flex; flex-direction:column; gap:18px; }
+    .swatches { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:6px; }
+    .sw { width:42px; height:42px; border-radius:999px; cursor:pointer; border:2px solid transparent;
+      box-shadow: inset 0 0 0 2px #fff, 0 1px 3px rgba(0,0,0,.18); position:relative; padding:0; transition: transform .12s ease; }
+    .sw:hover { transform: translateY(-2px); }
+    .sw[aria-pressed="true"] { border-color: var(--ink); }
+    .sw .tag { position:absolute; top:50px; left:50%; transform:translateX(-50%); font-size:10px; color:var(--muted); white-space:nowrap; }
+    .gemrow { display:flex; gap:8px; flex-wrap:wrap; }
+    .gem { padding:7px 13px; border-radius:999px; border:1px solid var(--line); background:#fff;
+      cursor:pointer; font-size:12.5px; display:flex; align-items:center; gap:7px; }
+    .gem[aria-pressed="true"]{ border-color:var(--ink); background:#faf8f4; }
+    .dot{ width:11px; height:11px; border-radius:999px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); }
+    .note { font-size:11px; color:var(--muted); line-height:1.5; border-top:1px solid var(--line); padding-top:12px; }
+    .status { font-size:11px; color:#9a8f7c; }
+    code { background:#f1ede6; padding:1px 5px; border-radius:5px; font-size:11px; }
+    .links { position:fixed; top:16px; right:16px; display:flex; gap:8px; }
+    .links a { font-size:12px; background:#fff; border:1px solid var(--line); border-radius:10px;
+      padding:7px 11px; text-decoration:none; color:var(--ink); }
+    .preset { font-size:11px; color:#b08d57; cursor:pointer; text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <div class="links">
+    <a href="./variants.html">variantes simples</a>
+    <a href="./index.html">runtime</a>
+  </div>
+  <div class="card">
+    <model-viewer id="mv"
+      src="./models/RE001-combo.glb"
+      environment-image="./models/studio.hdr"
+      camera-controls touch-action="pan-y"
+      shadow-intensity="0.6" shadow-softness="0.85"
+      exposure="1.0" tone-mapping="commerce"
+      field-of-view="30deg"
+      camera-orbit="0deg 75deg 160%"
+      min-camera-orbit="auto auto 130%" max-camera-orbit="auto auto 224%"
+      interaction-prompt="none"></model-viewer>
+
+    <div class="panel">
+      <div>
+        <div class="lab">JBM 3D Lab · combinación</div>
+        <h1>RE001 — Engagement Ring</h1>
+        <p class="sub">Piedra <strong>central</strong> y <strong>pavé</strong> ahora son independientes.
+        48 combinaciones horneadas (3 metales × 4 central × 4 pavé), 7 materiales, 1 archivo.</p>
+      </div>
+
+      <div class="block">
+        <div>
+          <div class="group-label">Metal</div>
+          <div class="swatches" id="metals"></div>
+        </div>
+        <div>
+          <div class="group-label">Piedra central</div>
+          <div class="gemrow" id="center"></div>
+        </div>
+        <div>
+          <div class="group-label">Pavé / acento</div>
+          <div class="gemrow" id="pave"></div>
+        </div>
+      </div>
+
+      <div class="status" id="status">cargando modelo…</div>
+      <div>
+        <span class="preset" data-p="white gold|sapphire|diamond">↳ zafiro central + pavé diamante (oro blanco)</span><br>
+        <span class="preset" data-p="yellow gold|ruby|diamond">↳ rubí central + pavé diamante (oro amarillo)</span><br>
+        <span class="preset" data-p="rose gold|emerald|ruby">↳ esmeralda central + pavé rubí (oro rosa)</span>
+      </div>
+
+      <div class="note">
+        La central es la malla grande (<code>NNMesh_464</code>); el pavé son 105 piedras chicas.
+        Se clasificaron por tamaño en mundo. Cada parte usa su material físico horneado (absorción, IOR).
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const mv = document.getElementById('mv');
+    const statusEl = document.getElementById('status');
+
+    const METALS = [
+      { id:'yellow gold', label:'Yellow', swatch:'linear-gradient(135deg,#f0d27a,#c79c2f)' },
+      { id:'white gold',  label:'White',  swatch:'linear-gradient(135deg,#ebeced,#b2b6bd)' },
+      { id:'rose gold',   label:'Rose',   swatch:'linear-gradient(135deg,#f0c6b4,#c08066)' },
+    ];
+    const GEMS = [
+      { id:'diamond',  label:'Diamond',  dot:'#dfe7ef' },
+      { id:'sapphire', label:'Sapphire', dot:'#1f4fbf' },
+      { id:'ruby',     label:'Ruby',     dot:'#b3122b' },
+      { id:'emerald',  label:'Emerald',  dot:'#0e8a4f' },
+    ];
+
+    const sel = { metal:'yellow gold', center:'diamond', pave:'diamond' };
+    function apply(){
+      const name = `${sel.metal}|${sel.center}|${sel.pave}`;
+      mv.variantName = name;
+      statusEl.textContent = `variante: ${name}`;
+    }
+
+    function buildSwatches(boxId, items, key){
+      const box = document.getElementById(boxId);
+      items.forEach((v,i)=>{
+        const el = document.createElement('button');
+        el.className='sw'; el.style.background=v.swatch; el.title=v.label;
+        el.setAttribute('aria-pressed', i===0?'true':'false');
+        el.innerHTML=`<span class="tag">${v.label}</span>`;
+        el.onclick=()=>{ sel[key]=v.id; mark(box,el); apply(); };
+        box.appendChild(el);
+      });
+    }
+    function buildPills(boxId, items, key){
+      const box = document.getElementById(boxId);
+      items.forEach((v,i)=>{
+        const el = document.createElement('button');
+        el.className='gem';
+        el.setAttribute('aria-pressed', i===0?'true':'false');
+        el.innerHTML=`<span class="dot" style="background:${v.dot}"></span>${v.label}`;
+        el.onclick=()=>{ sel[key]=v.id; mark(box,el); apply(); };
+        box.appendChild(el);
+      });
+    }
+    function mark(box, active){ [...box.children].forEach(c=>c.setAttribute('aria-pressed','false')); active.setAttribute('aria-pressed','true'); }
+    function syncUI(){
+      document.querySelectorAll('#metals .sw').forEach((el,i)=>el.setAttribute('aria-pressed', METALS[i].id===sel.metal?'true':'false'));
+      document.querySelectorAll('#center .gem').forEach((el,i)=>el.setAttribute('aria-pressed', GEMS[i].id===sel.center?'true':'false'));
+      document.querySelectorAll('#pave .gem').forEach((el,i)=>el.setAttribute('aria-pressed', GEMS[i].id===sel.pave?'true':'false'));
+    }
+
+    buildSwatches('metals', METALS, 'metal');
+    buildPills('center', GEMS, 'center');
+    buildPills('pave', GEMS, 'pave');
+
+    document.querySelectorAll('.preset').forEach(p=>{
+      p.onclick=()=>{ const [m,c,pa]=p.dataset.p.split('|'); sel.metal=m; sel.center=c; sel.pave=pa; syncUI(); apply(); };
+    });
+
+    mv.addEventListener('load', ()=>{
+      statusEl.textContent = `${(mv.availableVariants||[]).length} combinaciones — listo. Arrastra para rotar.`;
+      apply();
+    });
+    mv.addEventListener('error', ()=>{ statusEl.textContent='error cargando GLB'; });
+  </script>
+</body>
+</html>
