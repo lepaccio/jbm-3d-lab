@@ -1,225 +1,48 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fancy color · intensidad de piedra · Jewelry by Masters</title>
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.2.0/model-viewer.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Marcellus+SC&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<style>
-  :root{ color-scheme:light;
-    --gold:#b8860b; --gold-dark:#775a19; --ink:#1c1b1b; --brown:#4e4639;
-    --cream:#fcf9f8; --beige:#f5efe5; --border:rgba(209,197,180,0.55); --gray:#6a7282;
-    --display:'Marcellus SC',Georgia,serif; --serif:'Playfair Display',Georgia,serif; --sans:'Inter',system-ui,sans-serif; }
-  *{ box-sizing:border-box; }
-  html,body{ margin:0; min-height:100%; background:var(--cream); color:var(--ink); font-family:var(--sans); }
-  .topbar{ display:flex; align-items:center; gap:14px 18px; padding:14px 22px; background:rgba(252,249,248,0.92);
-    backdrop-filter:saturate(1.1) blur(6px); border-bottom:1px solid var(--border); flex-wrap:wrap; position:sticky; top:0; z-index:5; }
-  .topbar h1{ font-family:var(--display); font-size:15px; letter-spacing:2px; text-transform:uppercase; color:var(--gold-dark); margin:0; }
-  .topbar .tag{ font-size:11px; color:var(--gray); letter-spacing:.3px; }
-  .spacer{ flex:1; }
-  .seg{ display:flex; border:1px solid var(--border); border-radius:2px; overflow:hidden; background:#fff; }
-  .seg button{ padding:8px 15px; background:#fff; color:var(--brown); border:0; cursor:pointer;
-    font-family:var(--sans); font-size:11px; text-transform:uppercase; letter-spacing:1.2px; border-right:1px solid var(--border); transition:.15s; }
-  .seg button:last-child{ border-right:0; }
-  .seg button:hover{ background:var(--beige); }
-  .seg button.on{ background:var(--gold); color:#fff; font-weight:600; }
-  select{ background:#fff; color:var(--ink); border:1px solid var(--border); border-radius:2px; padding:8px 10px; font-size:12px; font-family:var(--sans); }
-  .wrap{ max-width:1400px; margin:0 auto; padding:24px 22px 40px; display:flex; flex-direction:column; gap:24px; }
-  .compare{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-  @media (max-width:760px){ .compare{ grid-template-columns:1fr; } }
-  .stage{ position:relative; aspect-ratio:1/1; border-radius:4px; overflow:hidden; border:1px solid var(--border);
-    background:radial-gradient(circle at 50% 38%,#ffffff 0%,#f7f1ea 55%,#efe6da 100%); box-shadow:0 18px 50px -28px rgba(78,70,57,.45); }
-  .stage model-viewer{ width:100%; height:100%; background:transparent; }
-  .badge{ position:absolute; bottom:12px; left:12px; background:rgba(28,27,27,.85); color:#fff;
-    font-size:10px; text-transform:uppercase; letter-spacing:1.6px; padding:5px 9px; backdrop-filter:blur(3px); }
-  .badge.live{ background:rgba(184,134,11,.92); }
-  .ctrl{ display:flex; flex-wrap:wrap; align-items:center; gap:14px 28px;
-    background:#fff; border:1px solid var(--border); border-radius:4px; padding:22px 26px; box-shadow:0 10px 40px -30px rgba(78,70,57,.5); }
-  .ctrl .big{ font-family:var(--serif); font-size:48px; font-weight:600; color:var(--gold); line-height:1; min-width:118px; }
-  .ctrl .big small{ font-family:var(--sans); font-size:14px; color:var(--gray); font-weight:400; letter-spacing:.3px; }
-  .ctrl .sl{ flex:1; min-width:220px; display:flex; flex-direction:column; gap:6px; }
-  .ctrl .lab{ font-size:11px; text-transform:uppercase; letter-spacing:1.6px; color:var(--gold-dark); }
-  input[type=range]{ width:100%; accent-color:var(--gold); height:26px; }
-  .hint{ font-size:12px; line-height:1.55; color:var(--brown); flex-basis:100%; }
-  .hint b{ color:var(--ink); font-weight:600; }
-  .foot{ font-size:11px; color:var(--gray); text-align:center; letter-spacing:.4px; }
-</style>
-</head><body>
-<div class="topbar">
-  <h1>Fancy Color · Intensidad</h1>
-  <span class="tag">Prueba de tonalidad — mismo visor de la web</span>
-  <span class="spacer"></span>
-  <div class="seg" id="stone">
-    <button data-stone="yellow" class="on">Diamante amarillo</button>
-    <button data-stone="pink">Diamante rosa</button>
-  </div>
-  <div class="seg" id="metal">
-    <button data-metal="white gold" class="on">White Gold</button>
-    <button data-metal="yellow gold">Yellow Gold</button>
-    <button data-metal="rose gold">Rose Gold</button>
-  </div>
-  <select id="sku"></select>
-</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Jewelry by Masters · Revisión 3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="masthead">
+      <p class="eyebrow">Jewelry by Masters</p>
+      <h1>Revisión de modelos&nbsp;3D</h1>
+      <p class="lede">Hola Fernando 👋 — abre cualquiera de los dos entornos para revisar los modelos. <strong>Producción</strong> es el sitio en vivo; <strong>Preview</strong> es la versión en revisión, antes de publicar.</p>
+    </header>
 
-<div class="wrap">
-  <div class="compare">
-    <div class="stage">
-      <model-viewer id="base" environment-image="env.hdr" exposure="1.0" tone-mapping="commerce"
-        loading="eager" reveal="auto" shadow-intensity="0.6" shadow-softness="0.85" interaction-prompt="none"
-        interpolation-decay="0" camera-orbit="0deg 75deg 160%" field-of-view="30deg"></model-viewer>
-      <span class="badge">Inicial · actual</span>
-    </div>
-    <div class="stage">
-      <model-viewer id="hero" environment-image="env.hdr" exposure="1.0" tone-mapping="commerce"
-        loading="eager" reveal="auto" shadow-intensity="0.6" shadow-softness="0.85"
-        camera-controls touch-action="pan-y" interaction-prompt="none"
-        auto-rotate auto-rotate-delay="600" rotation-per-second="18deg"
-        camera-orbit="0deg 75deg 160%" min-camera-orbit="auto auto 130%" max-camera-orbit="auto auto 224%"
-        field-of-view="30deg" min-field-of-view="40deg" max-field-of-view="45deg"></model-viewer>
-      <span class="badge live" id="liveBadge">Sin intensificar</span>
-    </div>
-  </div>
+    <section class="links" aria-label="Enlaces de revisión">
 
-  <div class="ctrl">
-    <div class="big"><span id="pct">0</span><small> % más intenso</small></div>
-    <div class="sl">
-      <div class="lab">Intensidad del color · solo afecta el lado derecho</div>
-      <input id="slider" type="range" min="0" max="100" step="1" value="0">
-    </div>
-    <div class="hint">Gira la joya y mueve el slider hasta el tono que te guste; <b>mándame la captura</b> con el %.
-    El metal, la luz y el entorno son los mismos de la web — solo cambia la intensidad de la piedra.</div>
-  </div>
-  <div class="foot">Izquierda = inicial (actual) · derecha = tu ajuste · mismo HDR y luz que la landing · solo cambia la piedra</div>
-</div>
+      <!-- ── PRODUCCIÓN (main) ─────────────────────────────────────── -->
+      <a class="card card--main" href="https://jewelrybymasters.com" target="_blank" rel="noopener">
+        <span class="card__tag">Principal · main</span>
+        <span class="card__title">Producción</span>
+        <span class="card__desc">El sitio en vivo. Rama <code>main</code>.</span>
+        <span class="card__url">jewelrybymasters.com</span>
+        <span class="card__cta">Abrir sitio en vivo →</span>
+      </a>
 
-<script type="module">
-const SKUS = ["RS001","RS002","RS003","RS004","RS005","RS006","RS007","RS008","RS009","RS010","RS011","RS012","RS013","RS014","RS015","RS016","RS017","RS018","RS019","RS020","RS021","RS022","RS023","RS024","RS025","RS026","RS027","RS029","RS030","RS031","RS032","RS033","RS034","RS035","RS036","RS037","RS038","RS039","RS040","RS041","RS042","RS043","RS044","RS045","RS046","RS047","RS048","RS049","RS051","RS052","RS053","RS054","RS055","RS056","RS057","RS058","RS059","RS060","RS061","RS062","RS063","RS064","RS065","RS066","RS067","RS068","RS069","RS070","RS071","RS072","RS073","RS074","RS075","RS076","RS077","RS078","RS079","RS080","RS081","RS082","RS083","RS084","RS085","RS086","RS087","RS088","RS089","RS090","RS091","RS092","RS093","RS094","RS095","RS096","RS097","RS098","RS099","RS100","RS101","RS102","RS103","RS104","RS105","RS106","RS107","RS108","RS109","RS110","RS111","RS112","RS113","RS114"];
-const DEFAULT_SKU = "RS002";
-const MAT = { yellow: 'G_yellow diamond', pink: 'G_pink diamond' };
-let stone = 'yellow', metal = 'white gold', sku = DEFAULT_SKU, sliderK = 0;
+      <!-- ── PREVIEW (dev) ─────────────────────────────────────────── -->
+      <a class="card" href="https://dev.jewerly-store.pages.dev" target="_blank" rel="noopener">
+        <span class="card__tag">Preview · dev</span>
+        <span class="card__title">Preview</span>
+        <span class="card__desc">Cambios en revisión. Rama <code>dev</code>.</span>
+        <span class="card__url">dev.jewerly-store.pages.dev</span>
+        <span class="card__cta">Abrir preview →</span>
+      </a>
 
-const clamp01 = (x) => Math.min(1, Math.max(0, x));
-const deepen  = (c, k) => clamp01(1 - (1 - c) * (1 + k));
+    </section>
 
-// ---- client-side GLB patcher (JSON chunk only; Draco bin spliced as-is) -----
-const srcCache = new Map();                    // sku -> ArrayBuffer
-async function source(sku){
-  if (!srcCache.has(sku)) srcCache.set(sku, fetch('models/' + sku + '.glb').then(r => r.arrayBuffer()));
-  return srcCache.get(sku);
-}
-function patch(srcBuf, matName, k){
-  if (k === 0) return srcBuf.slice(0);
-  const dv = new DataView(srcBuf);
-  const jsonLen = dv.getUint32(12, true);
-  const json = JSON.parse(new TextDecoder().decode(new Uint8Array(srcBuf, 20, jsonLen)));
-  const mat = json.materials.find((m) => m.name === matName);
-  if (!mat) throw new Error('material ' + matName + ' missing');
-  const pbr = mat.pbrMetallicRoughness || (mat.pbrMetallicRoughness = {});
-  const bcf = pbr.baseColorFactor || [1, 1, 1, 1];
-  pbr.baseColorFactor = [deepen(bcf[0], k), deepen(bcf[1], k), deepen(bcf[2], k), bcf[3] ?? 1];
-  const vol = mat.extensions && mat.extensions.KHR_materials_volume;
-  if (vol){
-    const ac = vol.attenuationColor || [1, 1, 1];
-    vol.attenuationColor = [deepen(ac[0], k), deepen(ac[1], k), deepen(ac[2], k)];
-    if (vol.attenuationDistance) vol.attenuationDistance = vol.attenuationDistance / (1 + k);
-  }
-  let jb = new TextEncoder().encode(JSON.stringify(json));
-  const pad = (4 - (jb.length % 4)) % 4;
-  if (pad){ const t = new Uint8Array(jb.length + pad); t.set(jb); for (let i = 0; i < pad; i++) t[jb.length + i] = 0x20; jb = t; }
-  const bin = new Uint8Array(srcBuf, 20 + jsonLen);
-  const total = 12 + 8 + jb.length + bin.length;
-  const out = new Uint8Array(total), odv = new DataView(out.buffer);
-  odv.setUint32(0, 0x46546c67, true); odv.setUint32(4, 2, true); odv.setUint32(8, total, true);
-  odv.setUint32(12, jb.length, true); odv.setUint32(16, 0x4e4f534a, true);
-  out.set(jb, 20); out.set(bin, 20 + jb.length);
-  return out.buffer;
-}
-
-// ---- viewers: left = baseline (Inicial), right = live slider -----------------
-const hero = document.getElementById('hero');     // right · interactive + auto-rotate
-const base = document.getElementById('base');     // left  · always 0%, mirrors hero
-const liveBadge = document.getElementById('liveBadge');
-const allMv = [hero, base];
-
-const PIVOT_UP = 0.30;   // raise orbit pivot toward the center stone (× bbox height)
-let heroCam = null;      // remembered camera so a re-bake (slider) doesn't snap the view back
-function applyVariant(mv){ try { mv.variantName = metal + '|' + (stone === 'yellow' ? 'yellow diamond' : 'pink diamond'); } catch (e) {} }
-// Pivot/center on the stone, not the whole ring: target the gem area (upper bbox).
-function recenter(){
-  if (!hero.loaded) return;
-  const c = hero.getBoundingBoxCenter(), d = hero.getDimensions();
-  const t = c.x + 'm ' + (c.y + d.y * PIVOT_UP) + 'm ' + c.z + 'm';
-  hero.cameraTarget = t;
-  if (base.loaded) base.cameraTarget = t;
-}
-function captureHero(){
-  if (!hero.loaded) return;
-  const o = hero.getCameraOrbit(), t = hero.getCameraTarget();
-  heroCam = {
-    orbit: (o.theta * 180 / Math.PI) + 'deg ' + (o.phi * 180 / Math.PI) + 'deg ' + o.radius + 'm',
-    fov: hero.getFieldOfView() + 'deg',
-    target: t.x + 'm ' + t.y + 'm ' + t.z + 'm',
-  };
-}
-allMv.forEach(mv => mv.addEventListener('load', () => {
-  applyVariant(mv);
-  if (mv === hero && heroCam){            // restore the view the user had before the re-bake
-    hero.cameraTarget = heroCam.target;
-    hero.cameraOrbit = heroCam.orbit;
-    hero.fieldOfView = heroCam.fov;
-  } else {
-    recenter();                           // first load / base: pivot on the stone
-  }
-}));
-
-const urls = new WeakMap();
-async function setSrc(mv, k){
-  const buf = await source(sku);
-  const patched = patch(buf, MAT[stone], k / 100);
-  const url = URL.createObjectURL(new Blob([patched], { type: 'model/gltf-binary' }));
-  const old = urls.get(mv); if (old) URL.revokeObjectURL(old);
-  urls.set(mv, url); mv.src = url;
-}
-
-async function renderHero(){ captureHero(); await setSrc(hero, sliderK); }
-async function renderBase(){ await setSrc(base, 0); }
-async function renderAll(){ await Promise.all([renderHero(), renderBase()]); }
-// metal change → no re-patch, just re-pin the variant on both viewers.
-function repin(){ allMv.forEach(applyVariant); }
-
-// ---- controls ---------------------------------------------------------------
-const slider = document.getElementById('slider'), pctEl = document.getElementById('pct');
-let raf = 0;
-slider.addEventListener('input', () => {
-  sliderK = +slider.value; pctEl.textContent = sliderK;
-  liveBadge.textContent = sliderK === 0 ? 'Sin intensificar' : '+' + sliderK + '% intenso';
-  cancelAnimationFrame(raf); raf = requestAnimationFrame(renderHero);
-});
-document.querySelectorAll('#stone button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('#stone button').forEach(x => x.classList.remove('on')); b.classList.add('on');
-  stone = b.dataset.stone; renderAll();
-}));
-document.querySelectorAll('#metal button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('#metal button').forEach(x => x.classList.remove('on')); b.classList.add('on');
-  metal = b.dataset.metal; repin();
-}));
-const skuSel = document.getElementById('sku');
-skuSel.innerHTML = SKUS.map(s => '<option value="' + s + '"' + (s === DEFAULT_SKU ? ' selected' : '') + '>' + s + '</option>').join('');
-skuSel.addEventListener('change', () => { sku = skuSel.value; heroCam = null; renderAll(); });
-
-// ---- camera: base (Inicial) mirrors the hero EVERY frame --------------------
-// rAF loop (not the camera-change event) so it tracks auto-rotate, drag & zoom
-// without relying on event source/timing.
-function mirror(){
-  if (hero.loaded && base.loaded){
-    const o = hero.getCameraOrbit();
-    base.cameraOrbit = (o.theta * 180 / Math.PI) + 'deg ' + (o.phi * 180 / Math.PI) + 'deg ' + o.radius + 'm';
-    base.fieldOfView = hero.getFieldOfView() + 'deg';
-  }
-  requestAnimationFrame(mirror);
-}
-requestAnimationFrame(mirror);
-
-renderAll();
-</script>
-</body></html>
+    <footer class="foot">
+      <p>Hecho con cariño por <strong>Cofoundy</strong></p>
+    </footer>
+  </main>
+</body>
+</html>
